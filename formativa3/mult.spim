@@ -1,0 +1,105 @@
+	.data
+
+space:	.asciiz		" "
+break:  .asciiz		"\n"
+multi:  .asciiz		"multifac: "
+
+	.text
+main:
+	li		$a0, -5		# $a0 = 3
+	li		$a1, 4		# $a1 = 9
+
+	jal		multfac		# jump to multfac and save position to $ra
+
+	mult		$a0, $a1		# $t0 * $t1 = Hi and Lo registers
+	mflo		$t2			# copy Lo to $t2
+	mfhi		$t3
+	
+	li		$v0, 1
+	move		$a0, $t3	# print hi
+	syscall
+
+	li  		$v0,4           # code for print_string
+    	la  		$a0,space       # point $a0 to string
+    	syscall             		# print the result string
+
+	li		$v0, 1
+	move		$a0, $t2	# print lo
+	syscall
+	
+	li  		$v0,4           # code for print_string
+    	la  		$a0,break       # point $a0 to string
+    	syscall  
+
+	li  		$v0,4           # code for print_string
+    	la  		$a0,multi       # point $a0 to string
+    	syscall             		# print the result string
+
+	li		$v0, 1
+	move		$a0, $t0	# print hi
+	syscall
+
+	li  		$v0,4           # code for print_string
+    	la  		$a0,space       # point $a0 to string
+    	syscall             		# print the result string
+
+	li		$v0, 1
+	move		$a0, $t1	# print lo
+	syscall
+
+	li		$v0, 10
+	syscall
+
+multfac:
+	# $t0 = hi	$t1 = lo	$t4 = contador	
+
+	# iniciando variaveis
+	move		$s0, $a0
+	move		$s1, $a1
+	move		$t4, $zero			# contador
+	li		$s1, 2147483648			# 1000...00
+
+	#slt		$t6, $s0, $zero			# checa se o MSB é 1
+	#slt		$t7, $s1, $zero			# checa se o MSB é 1
+
+	#beq		$t6, $zero, teste2
+	#subu		$s0, $zero, $s0			# transforma em unsigned
+
+teste2: 
+	#beq		$t7, $zero, passo1
+	#subu		$s1, $zero, $s1
+	
+passo1:
+	move		$t0, $zero			# inicializa P[63...32] = 0
+	move		$t1, $s1			# inicializa P[31...0] = multiplicador
+
+passo3:
+	andi		$t2, $t1, 1			# checa se o LSB do t1 é 1
+	beq		$t2, $zero, passo4		# if $t2 == 0 then passo4
+	add		$t0, $t0, $s0			# $t0 = $t0 + $s0
+
+passo4:
+	andi		$t6, $t0, 1			# salva o LSB do t0
+	
+	srl		$t0, $t0, 1			# shift right no t0
+	srl		$t1, $t1, 1			# shift right no t1
+	
+	beq		$t6, $zero, passo5		# se o LSB do t0 == 0, pula o proximo passo
+	xor		$t1, $t1, $s1			# muda o MSB para 1
+	
+passo5:
+	addi		$t4, $t4, 1			# contador++
+	
+	slti 		$t2, $t4, 32
+	bne		$t2, $zero, passo3		# if $t2 != zero then passo3
+	
+	#xor		$t2, $t6, $t7			# checa se ambos elementos tem o mesmo sinal
+	#beq		$t2, $zero, exit		# caso tenham, pula pro final
+
+	#sub 		$t1, $zero, $t1			# nega o resultado quando sinais diferentes
+
+	# mthi		$t0
+	# mtlo		$t1
+
+exit:
+	jr		$ra				# jump to ra

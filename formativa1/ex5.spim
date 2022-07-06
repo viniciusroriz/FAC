@@ -1,0 +1,65 @@
+        .data
+
+brk:    .asciiz "\n"
+
+        .text
+main:
+
+        #       t0 = i  t1 = j  t3 = ast  
+        #       t2 = k  s0 = n  t4 = bln
+
+        li      $v0, 5          # scan int
+        syscall
+        move    $s0, $v0        # $s0 = n
+
+        move    $t0, $zero      # $t0 = i = 0
+        
+        li      $t3, 1          # $t3 = ast = 1
+        move    $t4, $s0        # $t4 = bln = n
+
+for1:
+        slt	$t5, $t0, $s0	        # (i < n) ? 1 : 0
+        beq     $t5, $zero, exit1       
+
+        li      $t1, 1                  # $t1 = j = 1
+        move    $t2, $zero              # $t2 = k = 0  
+
+for2:   
+        slt	$t5, $t1, $t4	        # (j < bln) ? 1 : 0
+        beq     $t5, $zero, for3      
+
+        # codigo
+        li      $v0, 11                 # print char
+        li	$a0, ' '		# char = ' '
+        syscall
+        # codigo
+
+        addi	$t1, $t1, 1		# j++
+        j       for2                    # jump for 2
+
+for3:  
+        slt	$t5, $t2, $t3	        # (k < ast) ? 1 : 0
+        beq     $t5, $zero, exit2       
+
+        # codigo
+        li      $v0, 11                 # print char
+        li	$a0, '*'		# char = '*'
+        syscall
+        # codigo
+
+        addi	$t2, $t2, 1		# k++
+        j       for3                    # jump for 3
+
+exit2:
+        li      $v0, 4                  # print \n
+        la      $a0, brk
+        syscall
+
+        addi	$t3, $t3, 2		# ast + 2
+        addi	$t4, $t4, -1		# bln--
+
+        addi	$t0, $t0, 1		# i++
+        j	for1			# jump for 1
+exit1:
+        li $v0, 10
+        syscall

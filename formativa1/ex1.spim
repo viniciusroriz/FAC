@@ -1,0 +1,14 @@
+        .data
+
+ola:    .asciiz "Ola mundo\n"
+
+        .text
+
+main:
+
+        li      $v0, 4          # $v0 = print string
+        la      $a0, ola        # $a0 = Ola mundo
+        syscall
+
+        li      $v0, 10         # $v0 = end program
+        syscall 

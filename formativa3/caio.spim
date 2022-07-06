@@ -1,0 +1,73 @@
+multfac:
+    li $a0, -1  #so testando valores
+    li $a1, 4
+
+    slt $t6, $a0, $zero
+    bne $t6, $zero, PositivaA0
+
+    slt $t6, $a1, $zero
+    bne $t6, $zero, PositivaA1
+
+    bne $t6, $t5, N     #verifica se os sinais sao iguais ou diferentes
+
+    P:
+        move $s0, $a0   #recebe o multiplicando
+        li $t7, 0   #inicializa o contador
+
+        move $t1, $a1   #inicializa P[31...0] = multiplicador  
+        move $t0, $zero   #inicializa P[63...32] = 0
+
+        Verifica:
+            andi $a1, $t1, 1    #verifica se P[0] = 1
+            bne $a1, $zero SomaMult
+
+        Desloca:    #funcao que realiza os shifts à direita
+            andi $a1, $t0, 1    #verifica se P[32] = 1
+            bne $a1, $zero, L1  #Caso o LSB de hi seja '1', passa para o label L1
+
+            srl $t1, $t1, 1
+            srl $t0, $t0, 1
+            
+            addi $t7, $t7, 1        #incrementa o contador
+            slti $t6, $t7, 32		# $t6 = ($t7 < 32) ? 1 : 0
+            beq $t6, $zero, Encerra     #caso o contador chegue no 32 passo, encerra o programa
+            j Verifica  #caso contrario, volta para o passo de verificacao
+
+            L1:
+                srl $t1, $t1, 1
+                srl $t0, $t0, 1
+
+                li $s1, 2147483648   #Faz o MSB de P[31...0] ser 1
+                xor $t1, $t1, $s1
+
+                addi $t7, $t7, 1       #incrementa o contador
+                slti $t6, $t7, 32		# $t6 = ($t7 < 32) ? 1 : 0
+                beq $t6, $zero, Encerra     #caso o contador chegue no 32 passo, encerra o programa
+                j Verifica  #caso contrario, volta para o passo de verificacao
+
+        SomaMult:
+            addu $t0, $t0, $s0
+            j Desloca
+
+    PositivaA0:
+        subu $a0, $zero, $a0
+    PositivaA1:
+        subu $a1, $zero, $a1
+
+
+    N:
+           
+
+    Encerra:
+        li $v0, 1
+        move $a0, $t1
+        syscall
+
+        li $v0, 1
+        move $a0, $t0
+        syscall
+
+
+        li $v0, 10
+        syscall
+

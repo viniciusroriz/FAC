@@ -1,0 +1,26 @@
+elemDistintos:
+	# aux = s0	i = s1		
+	# a0 = vetor	a1 = n
+
+        li	$s0, 1			# aux = 1
+        li	$s1, 1			# i = 1
+	lw	$t6, ($a0)		# ???
+
+for:
+	slt	$t2, $s1, $a1		# (i < n) ? 1 : 0
+        beq	$t2, $zero, exit2
+	
+	move	$t5, $t6 
+	addi	$a0, $a0, 4
+	lw	$t6, ($a0)		
+	
+	beq	$t6, $t5, exit1		# if a[i] == a[i-1] skip
+	addi	$s0, $s0, 1		# aux++
+
+exit1:
+	addi	$s1, $s1, 1		# i++
+	j 	for
+
+exit2:
+	move 	$v0, $s0		# $v0 = aux
+	jr	$ra			# pula pra onde saiste

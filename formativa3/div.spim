@@ -1,0 +1,35 @@
+	.data
+	.text
+divfac:
+	# a0 = dividendo	a1 = divisor		hi = resto	lo = quociente
+
+	move		$lo, $a0
+	li		$t1, 1			# contador $t1 = 1
+	sll		$lo, $lo, 1		# shift a esquerda no resto
+
+for:
+	sub		$lo, $lo, $a1		# $lo = resto - divisor
+
+	blt		$lo, $zero, target	# if $t0 < 0 then target
+	sll		$lo, $lo, 1
+	ori		$lo, $lo, 1		# coloca 1 no LSB do resto
+
+	bge		$t1, 32, exit
+
+	addi		$t1, $t1, 1		# $t1 = $t1 + 1
+	j		for			# jump to for
+	
+target:
+	add		$lo, $lo, $a0
+	sll		$lo, $lo, 1		# shift a esquerda no resto
+	j		for			# jump to for
+
+
+exit:
+	move
+
+
+	
+	
+	
+	
